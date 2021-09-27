@@ -60,9 +60,14 @@
 
 <script lang="ts">
 import { ValidationProvider } from 'vee-validate';
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import deleteTodo from '~/apollo/mutation/deleteTodo';
-import updateStateTodo from '~/apollo/mutation/updateStateTodo';
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import deleteTodo from '~/apollo/mutation/deleteTodo.graphql';
+import updateStateTodo from '~/apollo/mutation/updateStateTodo.graphql';
+
+interface DraggableValue {
+  state: string;
+  id: string;
+}
 
 @Component({
   components: {
@@ -77,159 +82,146 @@ import updateStateTodo from '~/apollo/mutation/updateStateTodo';
       return splitString.map((string) => string[0]).join('');
     },
   },
-  data() {
-    return {
-      draggableValue: {
-        state: {
-          type: String,
-          default: '',
-        },
-        id: {
-          type: String,
-          default: '',
-        },
-      },
-      isEdit: {
-        type: Boolean,
-        default: false,
-      },
-    };
-  },
-
-  mounted() {
-    this.handleDropAndDrap();
-  },
-
-  methods: {
-    handleOnEditTodo() {
-      this.isEdit = !this.isEdit;
-    },
-    handleDeleteTodo(id) {
-      this.$confirm({
-        title: 'Are you sure?',
-        message: `Are you sure you want to delete?`,
-        button: {
-          no: 'No',
-          yes: 'Delete',
-        },
-        callback: (confirm) => {
-          if (confirm) {
-            this.$apollo
-              .mutate({
-                mutation: deleteTodo,
-                variables: {
-                  id,
-                },
-              })
-              .then(
-                ({
-                  data: {
-                    deleteTodo: { title },
-                  },
-                }) => {
-                  this.$toast.show(`Delete todo: "${title}" success! 🤪`, {
-                    type: 'success',
-                  });
-                }
-              )
-              .catch((error) => {
-                this.$toast.show(`Something wrong: "${error}"`, {
-                  type: 'error',
-                });
-              });
-          }
-        },
-      });
-    },
-    handleEditTodo(id) {
-      this.$router.push({
-        path: `/addtodo/${id}`,
-      });
-    },
-    handleDropAndDrap() {
-      const containers = document.querySelectorAll('.todo-container');
-      const draggables = document.querySelectorAll('.todo__item--main');
-
-      const getParent = (element: HTMLFormElement, selector: string) => {
-        while (element.parentElement) {
-          if (element.parentElement.matches(selector)) {
-            return element.parentElement;
-          }
-          element = element.parentElement;
-        }
-      };
-
-      draggables.forEach((draggable) => {
-        draggable.addEventListener('dragstart', () => {
-          draggable.classList.add('dragging');
-        });
-
-        draggable.addEventListener('dragend', (e) => {
-          draggable.classList.remove('dragging');
-          const containerDragging = getParent(e.target, '.todo-container');
-          const titleDragging = containerDragging.querySelector('.todo-container-title').outerText;
-
-          switch (titleDragging) {
-            case 'To do':
-              this.draggableValue.state = 'created';
-              break;
-            case 'In process':
-              this.draggableValue.state = 'process';
-              break;
-            case 'Completed':
-              this.draggableValue.state = 'completed';
-              break;
-            default:
-              this.draggableValue.state = '';
-          }
-
-          const { id } = draggable.querySelector('.todo__item-header');
-          this.draggableValue.id = id;
-          this.$apollo.mutate({
-            mutation: updateStateTodo,
-            variables: {
-              ...this.draggableValue,
-            },
-          });
-        });
-      });
-      const getDragAfterElement = (container, y) => {
-        const draggableElements = [
-          ...container.querySelectorAll('.todo__item--main:not(.dragging)'),
-        ];
-
-        return draggableElements.reduce(
-          (closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-              return { offset, element: child };
-            } else {
-              return closest;
-            }
-          },
-          { offset: Number.NEGATIVE_INFINITY }
-        ).element;
-      };
-
-      containers.forEach((container) => {
-        container.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          const afterElement = getDragAfterElement(container, e.clientY);
-          const draggable = document.querySelector('.dragging');
-          if (afterElement == null) {
-            container.appendChild(draggable);
-          } else {
-            container.insertBefore(draggable, afterElement);
-          }
-        });
-      });
-    },
-  },
 })
 export default class LoadingBar extends Vue {
   @Prop({ type: String, default: 'To do', required: true }) title!: string;
   @Prop({ type: Array, default: 'none', required: true }) listTodo!: any;
+
+  isEdit: boolean = false;
+  draggableValue: DraggableValue = {
+    state: '',
+    id: '',
+  };
+
+  handleOnEditTodo() {
+    this.isEdit = !this.isEdit;
+  }
+
+  handleEditTodo(id: string) {
+    this.$router.push({
+      path: `/addtodo/${id}`,
+    });
+  }
+
+  handleDeleteTodo(id: string) {
+    this.$confirm({
+      title: 'Are you sure?',
+      message: `Are you sure you want to delete?`,
+      button: {
+        no: 'No',
+        yes: 'Delete',
+      },
+      callback: (confirm: boolean) => {
+        if (confirm) {
+          this.$apollo
+            .mutate({
+              mutation: deleteTodo,
+              variables: {
+                id,
+              },
+            })
+            .then(
+              ({
+                data: {
+                  deleteTodo: { title },
+                },
+              }) => {
+                this.$toast.show(`Delete todo: "${title}" success! 🤪`, {
+                  type: 'success',
+                });
+              }
+            )
+            .catch((error) => {
+              this.$toast.show(`Something wrong: "${error}"`, {
+                type: 'error',
+              });
+            });
+        }
+      },
+    });
+  }
+
+  handleDropAndDrap() {
+    const containers = document.querySelectorAll('.todo-container');
+    const draggables = document.querySelectorAll('.todo__item--main');
+
+    const getParent = (element: HTMLFormElement, selector: string) => {
+      while (element.parentElement) {
+        if (element.parentElement.matches(selector)) {
+          return element.parentElement;
+        }
+        element = element.parentElement;
+      }
+    };
+
+    draggables.forEach((draggable) => {
+      draggable.addEventListener('dragstart', () => {
+        draggable.classList.add('dragging');
+      });
+
+      draggable.addEventListener('dragend', (e) => {
+        draggable.classList.remove('dragging');
+        const containerDragging = getParent(e.target, '.todo-container');
+        const titleDragging = containerDragging.querySelector('.todo-container-title').outerText;
+
+        switch (titleDragging) {
+          case 'To do':
+            this.draggableValue.state = 'created';
+            break;
+          case 'In process':
+            this.draggableValue.state = 'process';
+            break;
+          case 'Completed':
+            this.draggableValue.state = 'completed';
+            break;
+          default:
+            this.draggableValue.state = '';
+        }
+
+        const { id } = draggable.querySelector('.todo__item-header');
+        this.draggableValue.id = id;
+        this.$apollo.mutate({
+          mutation: updateStateTodo,
+          variables: {
+            ...this.draggableValue,
+          },
+        });
+      });
+    });
+    const getDragAfterElement = (container, y) => {
+      const draggableElements = [...container.querySelectorAll('.todo__item--main:not(.dragging)')];
+
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+          } else {
+            return closest;
+          }
+        },
+        { offset: Number.NEGATIVE_INFINITY }
+      ).element;
+    };
+
+    containers.forEach((container) => {
+      container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        const draggable = document.querySelector('.dragging');
+        if (afterElement == null) {
+          container.appendChild(draggable);
+        } else {
+          container.insertBefore(draggable, afterElement);
+        }
+      });
+    });
+  }
+
+  mounted() {
+    this.handleDropAndDrap();
+  }
 }
 </script>
 

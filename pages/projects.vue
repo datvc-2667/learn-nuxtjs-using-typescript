@@ -19,32 +19,23 @@
   </div>
 </template>
 
-<script>
-import project from '~/apollo/queries/project';
+<script lang="ts">
+import { ValidationProvider } from 'vee-validate';
+import { Vue, Component } from 'vue-property-decorator';
+import type { MetaInfo } from 'vue-meta';
+import project from '~/apollo/queries/project.graphql';
+import { Todo } from '~/model';
 
-export default {
-  data() {
+@Component({
+  components: {
+    ValidationProvider,
+  },
+
+  head(this: Project): MetaInfo {
     return {
-      todoByProject: [],
+      title: 'Todo',
     };
   },
-
-  head: {
-    title: 'To do',
-  },
-
-  computed: {
-    todoCreate() {
-      return this.todoByProject.filter((todo) => todo.status === 'created') || [];
-    },
-    todoProcess() {
-      return this.todoByProject.filter((todo) => todo.status === 'process') || [];
-    },
-    todoCompleted() {
-      return this.todoByProject.filter((todo) => todo.status === 'completed') || [];
-    },
-  },
-
   apollo: {
     todoByProject: {
       prefetch: true,
@@ -57,10 +48,26 @@ export default {
       },
     },
   },
+})
+export default class Project extends Vue {
+  todoByProject: Todo[] = [];
+
   created() {
     this.$apollo.queries.todoByProject.refetch();
-  },
-};
+  }
+
+  get todoCreate() {
+    return this.todoByProject.filter((todo: Todo) => todo.status === 'created') || [];
+  }
+
+  get todoProcess() {
+    return this.todoByProject.filter((todo: Todo) => todo.status === 'process') || [];
+  }
+
+  get todoCompleted() {
+    return this.todoByProject.filter((todo: Todo) => todo.status === 'completed') || [];
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>
