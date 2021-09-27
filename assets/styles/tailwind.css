@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply block
+    w-full
+    px-5
+    py-2
+    rounded-lg
+    transform
+    transition
+    hover:bg-brand-light hover:-translate-y-0.5
+    focus:ring-opacity-50
+    focus:outline-none
+    focus:ring
+    focus:ring-offset-2
+    tracking-wider
+    shadow-lg;
+  }
+
+  .btn-primary {
+    @apply bg-green-400 text-black hover:bg-green-400 focus:ring-green-500 focus:ring-opacity-50 active:bg-green-600;
+  }
+
+  .btn-disable {
+    @apply bg-gray-300 text-gray-800 hover:bg-gray-200 focus:ring-gray-300 focus:ring-opacity-50 active:bg-gray-400;
+  }
+
+  .todo-container {
+    @apply rounded-lg
+    px-3
+    bg-gradient-to-b
+    from-primary-dark
+    via-primary
+    to-primary-light;
+  }
+  .todo {
+    @apply flex flex-col
+    bg-white
+    rounded-lg
+    my-3
+    p-3
+    select-none
+    shadow-xl
+    /* hover:animate-bounce */
+    cursor-grabbing;
+  }
+  .todo-header {
+    @apply flex flex-row
+    justify-between
+    items-center
+    py-2;
+  }
+
+  .person-icon {
+    @apply bg-notify
+    inline-block
+    w-9
+    h-9
+    text-center
+    leading-8
+    border-2
+    border-white
+    border-solid
+    rounded-full;
+  }
+  .dragging {
+    @apply transition-all origin-center transform rotate-45;
+  }
+
+  .notify-status {
+    @apply animate-pulse
+    relative
+    bottom-0.5
+    inline-flex
+    rounded-full
+    h-2
+    w-2;
+  }
+  .is-invalid {
+    @apply text-red-500 border-red-600;
+  }
+}
+
+@layer base {
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select {
+    @apply rounded-lg w-full border border-gray-300 shadow-sm;
+  }
+  [type='checkbox'],
+  [type='radio'] {
+    @apply h-5 w-5 rounded text-purple-600 focus:ring-purple-500 cursor-pointer;
+  }
+  [type='checkbox'].is-invalid,
+  [type='radio'].is-invalid {
+    @apply text-red-500 border-red-600;
+  }
+}

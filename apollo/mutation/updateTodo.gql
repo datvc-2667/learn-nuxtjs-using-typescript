@@ -1,0 +1,28 @@
+mutation UpdateTodo(
+  $id: ID!
+  $title: String
+  $content: [String]
+  $team: [String]
+  $status: String
+  $projectId: String
+) {
+  editTodo(
+    id: $id
+    title: $title
+    content: $content
+    team: $team
+    status: $status
+    projectId: $projectId
+  ) {
+    id
+    title
+    content
+    team {
+      id
+      name
+      avatar
+    }
+    status
+    projectId
+  }
+}

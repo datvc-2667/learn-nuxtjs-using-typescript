@@ -1,0 +1,9 @@
+mutation UpdateStateTodo($id: ID!, $state: String) {
+  editTodo(id: $id, status: $state) {
+    id
+    title
+    content
+    status
+    projectId
+  }
+}

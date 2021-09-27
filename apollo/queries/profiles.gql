@@ -1,0 +1,7 @@
+query GetAllProfile {
+  profiles {
+    id
+    name
+    avatar
+  }
+}

@@ -1,0 +1,14 @@
+query ExampleQuery($id: ID!) {
+  todo(id: $id) {
+    id
+    title
+    content
+    team {
+      id
+      name
+      avatar
+    }
+    status
+    projectId
+  }
+}

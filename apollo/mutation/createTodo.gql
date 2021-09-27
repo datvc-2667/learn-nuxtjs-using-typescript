@@ -1,0 +1,27 @@
+mutation CreateTodo(
+  $title: String
+  $content: [String]
+  $team: [String]
+  $status: String
+  $projectId: String
+) {
+  createTodo(
+    title: $title
+    content: $content
+    team: $team
+    status: $status
+    projectId: $projectId
+  ) {
+    id
+    title
+    content
+    team {
+      id
+      name
+      avatar
+      phoneNumber
+    }
+    status
+    projectId
+  }
+}
