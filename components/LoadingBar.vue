@@ -14,6 +14,7 @@ export default class LoadingBar extends Vue {
   start(): boolean {
     return (this.loading = true);
   }
+
   finish(): boolean {
     return (this.loading = false);
   }

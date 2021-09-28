@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { ValidationProvider } from 'vee-validate';
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component } from 'nuxt-property-decorator';
 import type { MetaInfo } from 'vue-meta';
 import project from '~/apollo/queries/project.graphql';
 import { Todo } from '~/model';
@@ -36,36 +36,39 @@ import { Todo } from '~/model';
       title: 'Todo',
     };
   },
-  apollo: {
-    todoByProject: {
-      prefetch: true,
-      query: project,
-      variables() {
-        return { projectId: '6143f615d28fa9d72566cb25' };
-      },
-      result({ data: { todoByProject }, loading, networkStatus }) {
-        this.todoByProject = todoByProject;
-      },
-    },
-  },
 })
 export default class Project extends Vue {
   todoByProject: Todo[] = [];
 
-  created() {
-    this.$apollo.queries.todoByProject.refetch();
+  // created() {
+  //   this.$apolloProvider!.defaultClient.query.todoByProject.refetch();
+  // }
+
+  mounted() {
+    this.getTodo();
   }
 
   get todoCreate() {
-    return this.todoByProject.filter((todo: Todo) => todo.status === 'created') || [];
+    return this.todoByProject.filter((todo: Todo) => todo.status === 'created');
   }
 
   get todoProcess() {
-    return this.todoByProject.filter((todo: Todo) => todo.status === 'process') || [];
+    return this.todoByProject.filter((todo: Todo) => todo.status === 'process');
   }
 
   get todoCompleted() {
-    return this.todoByProject.filter((todo: Todo) => todo.status === 'completed') || [];
+    return this.todoByProject.filter((todo: Todo) => todo.status === 'completed');
+  }
+
+  async getTodo(projectId: string = '6143f615d28fa9d72566cb25') {
+    try {
+      await this.$apolloProvider!.defaultClient.query({
+        query: project,
+        variables: { projectId },
+      }).then(({ data: { todoByProject } }) => {
+        this.todoByProject = todoByProject;
+      });
+    } catch (error) {}
   }
 }
 </script>

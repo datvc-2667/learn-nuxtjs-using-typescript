@@ -1,24 +1,5 @@
-import VueI18n from 'vue-i18n';
 import Vue from 'vue';
 import * as VeeValidate from 'vee-validate';
-import en from 'vee-validate/dist/locale/en.json';
-import ar from 'vee-validate/dist/locale/ar.json';
-import vi from 'vee-validate/dist/locale/vi.json';
-
-const i18n = new VueI18n({
-  locale: 'en',
-  messages: {
-    en: {
-      validations: en,
-    },
-    ar: {
-      validations: ar,
-    },
-    vi: {
-      validations: vi,
-    },
-  },
-});
 
 const config = {
   aria: true,

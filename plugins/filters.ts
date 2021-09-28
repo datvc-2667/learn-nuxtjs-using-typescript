@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-Vue.filter('capitalize', function (value) {
+Vue.filter('capitalize', function (value: string): string {
   if (!value) {
     return '';
   }
@@ -8,7 +8,7 @@ Vue.filter('capitalize', function (value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 });
 
-Vue.filter('truncateString', function (value, length, suffix) {
+Vue.filter('truncateString', function (value: string, length: number, suffix: string): string {
   if (value.length > length) {
     return value.substring(0, length) + suffix;
   } else {

@@ -62,9 +62,8 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '~/plugins/vue-tooltip.js',
-    '~/plugins/i18n.js',
     '~/plugins/router',
-    '~/plugins/filters',
+    '~/plugins/filters.ts',
     '~/plugins/vee-validate',
     '~/plugins/validation',
     { src: '~plugins/vue-calendar.js', mode: 'client' },
@@ -138,7 +137,7 @@ export default {
   apollo: {
     clientConfigs: {
       default: {
-        httpEndpoint: 'http://localhost:5000/graphql',
+        httpEndpoint: process.env.API_GRAPHQL,
       },
     },
   },

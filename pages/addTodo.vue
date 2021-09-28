@@ -61,37 +61,6 @@ import { Todo } from '~/model';
       },
     },
   },
-  mounted() {
-    const id = this.$route.params.id;
-    if (!id) return;
-
-    this.$apollo
-      .query({
-        query: todo,
-        variables: {
-          id,
-          content: this.todo.content.split(/\r?\n/),
-        },
-      })
-      .then(({ data: { todo } }) => {
-        const { title, content, team, status, projectId } = todo;
-        const member = team.map((person) => person.name);
-        const contentString = content.join('\n');
-        this.todo = {
-          title,
-          content: contentString,
-          team: member,
-          status,
-          projectId,
-        };
-      })
-      .catch((error) => {
-        this.$toast.show(`Something wrong: ${error}`, {
-          type: 'error',
-          duration: 8000,
-        });
-      });
-  },
 })
 export default class Project extends Vue {
   todo: Todo = {
@@ -187,6 +156,38 @@ export default class Project extends Vue {
         });
       }
     });
+  }
+
+  mounted() {
+    const id = this.$route.params.id;
+    if (!id) return;
+
+    this.$apollo
+      .query({
+        query: todo,
+        variables: {
+          id,
+          content: this.todo.content.split(/\r?\n/),
+        },
+      })
+      .then(({ data: { todo } }) => {
+        const { title, content, team, status, projectId } = todo;
+        const member = team.map((person) => person.name);
+        const contentString = content.join('\n');
+        this.todo = {
+          title,
+          content: contentString,
+          team: member,
+          status,
+          projectId,
+        };
+      })
+      .catch((error) => {
+        this.$toast.show(`Something wrong: ${error}`, {
+          type: 'error',
+          duration: 8000,
+        });
+      });
   }
 }
 </script>

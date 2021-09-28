@@ -8,7 +8,12 @@
       <i class="fas fa-plus"></i>
     </button>
 
-    <div v-for="todo in listTodo" :key="todo.id" class="todo todo__item--main" draggable="true">
+    <div
+      v-for="(todo, index) in listTodo"
+      :key="todo.id + index"
+      class="todo todo__item--main"
+      draggable="true"
+    >
       <div :id="todo.id" class="todo-header todo__item-header">
         <h4
           class="font-semibold outline-none cursor-text flex-1"
@@ -63,6 +68,13 @@ import { ValidationProvider } from 'vee-validate';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import deleteTodo from '~/apollo/mutation/deleteTodo.graphql';
 import updateStateTodo from '~/apollo/mutation/updateStateTodo.graphql';
+import { Todo } from '~/model';
+
+enum StateTodo {
+  PENDING = 'To do',
+  IN_PROCESS = 'In process',
+  DONE = 'Completed',
+}
 
 interface DraggableValue {
   state: string;
@@ -85,7 +97,7 @@ interface DraggableValue {
 })
 export default class LoadingBar extends Vue {
   @Prop({ type: String, default: 'To do', required: true }) title!: string;
-  @Prop({ type: Array, default: 'none', required: true }) listTodo!: any;
+  @Prop({ type: Array, default: 'none', required: true }) listTodo!: Todo[];
 
   isEdit: boolean = false;
   draggableValue: DraggableValue = {
@@ -165,13 +177,13 @@ export default class LoadingBar extends Vue {
         const titleDragging = containerDragging.querySelector('.todo-container-title').outerText;
 
         switch (titleDragging) {
-          case 'To do':
+          case StateTodo.PENDING:
             this.draggableValue.state = 'created';
             break;
-          case 'In process':
+          case StateTodo.IN_PROCESS:
             this.draggableValue.state = 'process';
             break;
-          case 'Completed':
+          case StateTodo.DONE:
             this.draggableValue.state = 'completed';
             break;
           default:

@@ -34,7 +34,7 @@ export default class LoadingBar extends Vue {
   @Prop({ default: '' }) value!: string;
 
   @Emit('input')
-  updateValue(event: HTMLFormElement): string {
+  updateValue(event: HTMLFormElement) {
     return event.target.value;
   }
 }
